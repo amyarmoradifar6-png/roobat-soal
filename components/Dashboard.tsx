@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ViewState, Subject, Chapter } from '../types';
 
@@ -16,7 +15,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
       {/* Back Button */}
       <button 
         onClick={onBackToSubjects}
-        className="flex items-center gap-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors font-medium mb-4 animate-fade-up"
+        className="flex items-center gap-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-transform hover:scale-105 active:scale-95 font-medium mb-4 animate-fade-up"
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
@@ -40,7 +39,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
           <div 
             key={chapter.id}
             onClick={() => onChapterSelect(chapter.id)}
-            className={`group bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] hover:shadow-xl dark:shadow-none border border-slate-100 dark:border-slate-800 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden cursor-pointer animate-fade-up delay-${Math.min((index + 2) * 100, 700)}`}
+            className={`group bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] hover:shadow-xl dark:shadow-none border border-slate-100 dark:border-slate-800 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] active:scale-95 relative overflow-hidden cursor-pointer animate-fade-up delay-${Math.min((index + 2) * 100, 700)}`}
           >
             <div className="flex justify-between items-start mb-4">
                {/* Icon */}
@@ -82,7 +81,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
         {/* Global Solver Card */}
          <div 
             onClick={() => onNavigate(ViewState.SOLVER)}
-            className={`group bg-gradient-to-br ${subject.id === 'MATH' ? 'from-blue-600 to-indigo-700' : subject.id === 'CHEMISTRY' ? 'from-emerald-600 to-teal-700' : subject.id === 'GEOMETRY' ? 'from-rose-600 to-pink-700' : 'from-amber-500 to-orange-600'} rounded-3xl p-6 md:p-8 shadow-xl text-white cursor-pointer hover:-translate-y-1 transition-all duration-300 relative overflow-hidden md:col-span-2 flex flex-col md:flex-row items-center gap-6 animate-fade-up delay-300`}
+            className={`group bg-gradient-to-br ${subject.id === 'MATH' ? 'from-blue-600 to-indigo-700' : subject.id === 'CHEMISTRY' ? 'from-emerald-600 to-teal-700' : subject.id === 'GEOMETRY' ? 'from-rose-600 to-pink-700' : 'from-amber-500 to-orange-600'} rounded-3xl p-6 md:p-8 shadow-xl text-white cursor-pointer hover:-translate-y-1 hover:scale-[1.01] active:scale-95 transition-all duration-300 relative overflow-hidden md:col-span-2 flex flex-col md:flex-row items-center gap-6 animate-fade-up delay-300`}
           >
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl backdrop-blur-sm animate-[bounce_3s_infinite]">
                 🧮
@@ -113,7 +112,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
             {/* Sudoku Card */}
             <button 
                 onClick={() => onNavigate(ViewState.SUDOKU)}
-                className="bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg transition-all group h-full animate-pop-in delay-100"
+                className="bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg hover:scale-105 active:scale-95 transition-all group h-full animate-pop-in delay-100"
             >
                 <div className="w-16 h-16 bg-white dark:bg-sky-900 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
                     🧩
@@ -127,7 +126,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
             {/* Memory Game Card */}
             <button 
                 onClick={() => onNavigate(ViewState.MEMORY_GAME)}
-                className="bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg transition-all group h-full animate-pop-in delay-200"
+                className="bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg hover:scale-105 active:scale-95 transition-all group h-full animate-pop-in delay-200"
             >
                 <div className="w-16 h-16 bg-white dark:bg-rose-900 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
                     🧠
@@ -141,7 +140,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
             {/* Word Guess Card */}
             <button 
                 onClick={() => onNavigate(ViewState.WORD_GUESS)}
-                className="bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg transition-all group h-full animate-pop-in delay-300"
+                className="bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg hover:scale-105 active:scale-95 transition-all group h-full animate-pop-in delay-300"
             >
                 <div className="w-16 h-16 bg-white dark:bg-orange-900 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
                     🔡
@@ -152,13 +151,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
                 </div>
             </button>
 
-            {/* Liquid Sort Card */}
+            {/* Liquid Sort Card - Changed Icon to 🥤 to distinguish from chemistry */}
             <button 
                 onClick={() => onNavigate(ViewState.LIQUID_SORT)}
-                className="bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg transition-all group h-full animate-pop-in delay-400"
+                className="bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg hover:scale-105 active:scale-95 transition-all group h-full animate-pop-in delay-400"
             >
                 <div className="w-16 h-16 bg-white dark:bg-teal-900 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
-                    🧪
+                    🥤
                 </div>
                 <div className="text-center">
                     <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">آزمایشگاه مایعات</h3>

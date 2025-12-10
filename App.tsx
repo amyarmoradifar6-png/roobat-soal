@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { Dashboard } from './components/Dashboard';
@@ -14,11 +13,12 @@ import { SudokuGame } from './components/SudokuGame';
 import { MemoryGame } from './components/MemoryGame';
 import { WordGuessGame } from './components/WordGuessGame';
 import { LiquidSortGame } from './components/LiquidSortGame';
+import { WelcomeScreen } from './components/WelcomeScreen';
 import { ViewState, Subject, SubjectId } from './types';
 import { SUBJECT_CHAPTERS } from './constants';
 
 const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<ViewState>(ViewState.SUBJECT_SELECTION);
+  const [currentView, setCurrentView] = useState<ViewState>(ViewState.WELCOME);
   const [isDark, setIsDark] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null);
@@ -33,6 +33,10 @@ const App: React.FC = () => {
   }, [isDark]);
 
   const toggleTheme = () => setIsDark(!isDark);
+
+  const handleStartApp = () => {
+    setCurrentView(ViewState.SUBJECT_SELECTION);
+  };
 
   const handleSubjectSelect = (subject: Subject) => {
     setSelectedSubject(subject);
@@ -81,6 +85,9 @@ const App: React.FC = () => {
 
   const renderContent = () => {
     switch (currentView) {
+      case ViewState.WELCOME:
+        return <WelcomeScreen onStart={handleStartApp} />;
+
       case ViewState.SUBJECT_SELECTION:
         return <SubjectSelection onSelectSubject={handleSubjectSelect} />;
 
@@ -123,7 +130,10 @@ const App: React.FC = () => {
         return <SampleQuestionsInterface initialChapter={selectedChapterId} onBack={handleBackToDetail} />;
 
       case ViewState.SOLVER:
-        return <ProblemSolver />;
+        // Solver can be accessed from Dashboard (no chapter selected) or detail.
+        // If accessed from Dashboard, back button goes to Dashboard.
+        const handleSolverBack = selectedChapterId ? handleBackToDetail : handleBackToDashboard;
+        return <ProblemSolver onBack={handleSolverBack} />;
 
       case ViewState.SUDOKU:
         return <SudokuGame onBack={handleBackToDashboard} />;

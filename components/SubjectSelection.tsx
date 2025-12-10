@@ -1,13 +1,29 @@
-
 import React from 'react';
 import { SUBJECTS } from '../constants';
-import { Subject } from '../types';
+import { Subject, SubjectId } from '../types';
 
 interface SubjectSelectionProps {
   onSelectSubject: (subject: Subject) => void;
 }
 
 export const SubjectSelection: React.FC<SubjectSelectionProps> = ({ onSelectSubject }) => {
+  
+  const getAnimationClass = (id: SubjectId) => {
+    switch (id) {
+      case SubjectId.PHYSICS:
+        return 'animate-spark';
+      case SubjectId.CHEMISTRY:
+        return 'animate-pour origin-bottom';
+      default:
+        return 'animate-float';
+    }
+  };
+
+  const getIconSize = (id: SubjectId) => {
+     if (id === SubjectId.GEOMETRY) return 'text-5xl'; // Bigger triangle
+     return 'text-3xl';
+  };
+
   return (
     <div className="space-y-10 py-8 pb-20">
       {/* Hero Section */}
@@ -26,13 +42,13 @@ export const SubjectSelection: React.FC<SubjectSelectionProps> = ({ onSelectSubj
           <button
             key={subject.id}
             onClick={() => onSelectSubject(subject)}
-            className={`group bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] hover:shadow-xl dark:shadow-none border-2 border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden text-right animate-fade-up delay-${(index + 1) * 100}`}
+            className={`group bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] hover:shadow-xl dark:shadow-none border-2 border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] active:scale-95 relative overflow-hidden text-right animate-fade-up delay-${(index + 1) * 100}`}
             style={{ animationFillMode: 'both' }}
           >
             <div className="flex justify-between items-start mb-4">
-               {/* Icon */}
-              <div className={`w-16 h-16 ${subject.bgClass} bg-opacity-10 dark:bg-opacity-20 rounded-2xl flex items-center justify-center text-3xl transition-transform duration-300 group-hover:scale-110`}>
-                <span className="filter drop-shadow-sm">{subject.icon}</span>
+               {/* Icon with specific animations */}
+              <div className={`w-16 h-16 ${subject.bgClass} bg-opacity-10 dark:bg-opacity-20 rounded-2xl flex items-center justify-center ${getIconSize(subject.id)} transition-transform duration-300 group-hover:scale-110`}>
+                <span className={`filter drop-shadow-sm ${getAnimationClass(subject.id)}`}>{subject.icon}</span>
               </div>
               
               {/* Arrow Icon */}

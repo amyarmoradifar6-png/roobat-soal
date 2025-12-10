@@ -1,8 +1,11 @@
-
 import React, { useState, useRef } from 'react';
 import { solveProblem } from '../services/geminiService';
 
-export const ProblemSolver: React.FC = () => {
+interface ProblemSolverProps {
+  onBack?: () => void;
+}
+
+export const ProblemSolver: React.FC<ProblemSolverProps> = ({ onBack }) => {
   const [problem, setProblem] = useState('');
   const [solution, setSolution] = useState<string | null>(null);
   const [isSolving, setIsSolving] = useState(false);
@@ -130,6 +133,20 @@ export const ProblemSolver: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+      
+      {/* Header with Back Button */}
+      {onBack && (
+        <button 
+            onClick={onBack}
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-transform hover:scale-105 active:scale-95 font-medium mb-2"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+            </svg>
+            <span>بازگشت</span>
+        </button>
+      )}
+
       <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 text-white shadow-lg">
         <h2 className="text-2xl font-bold mb-2">حل‌المسائل هوشمند</h2>
         <p className="text-indigo-100">صورت سوال خود را بنویسید، بگویید یا عکس آن را آپلود کنید.</p>
@@ -148,7 +165,7 @@ export const ProblemSolver: React.FC = () => {
             <img src={selectedImage.url} alt="Selected Problem" className="h-32 rounded-lg border border-slate-300 dark:border-slate-700" />
             <button 
               onClick={removeImage}
-              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition-colors"
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition-colors hover:scale-110 active:scale-95"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -159,12 +176,12 @@ export const ProblemSolver: React.FC = () => {
 
         <div className="flex justify-between items-center mt-4">
           <div className="flex gap-2">
-            <button onClick={handleToggleListening} className={`p-2.5 rounded-full transition-all duration-300 ${isListening ? 'bg-red-500 text-white animate-pulse shadow-red-300 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`} title="تایپ صوتی">
+            <button onClick={handleToggleListening} className={`p-2.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 ${isListening ? 'bg-red-500 text-white animate-pulse shadow-red-300 shadow-lg' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`} title="تایپ صوتی">
               <svg xmlns="http://www.w3.org/2000/svg" fill={isListening ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
               </svg>
             </button>
-            <button onClick={() => fileInputRef.current?.click()} className="p-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" title="افزودن عکس">
+            <button onClick={() => fileInputRef.current?.click()} className="p-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all hover:scale-105 active:scale-95" title="افزودن عکس">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
               </svg>
@@ -172,7 +189,7 @@ export const ProblemSolver: React.FC = () => {
             <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
           </div>
 
-          <button onClick={handleSolve} disabled={(!problem.trim() && !selectedImage) || isSolving} className="px-6 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-xl hover:bg-slate-800 dark:hover:bg-slate-600 disabled:opacity-50 transition-colors flex items-center gap-2">
+          <button onClick={handleSolve} disabled={(!problem.trim() && !selectedImage) || isSolving} className="px-6 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-xl hover:bg-slate-800 dark:hover:bg-slate-600 disabled:opacity-50 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
             {isSolving ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

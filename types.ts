@@ -1,6 +1,7 @@
 
 export enum ViewState {
-  SUBJECT_SELECTION = 'SUBJECT_SELECTION', // New View
+  WELCOME = 'WELCOME', // New View
+  SUBJECT_SELECTION = 'SUBJECT_SELECTION',
   HOME = 'HOME', // Chapter Selection (Dashboard)
   CHAT = 'CHAT',
   QUIZ = 'QUIZ',

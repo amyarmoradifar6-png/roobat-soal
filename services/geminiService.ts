@@ -24,6 +24,19 @@ You must output a detailed, step-by-step solution in Persian.
 Format clearly with bold headers for each step.
 `;
 
+// Helper to safely parse JSON from AI response
+const parseJson = <T>(text: string | undefined, fallback: T): T => {
+  if (!text) return fallback;
+  try {
+    // Remove markdown code blocks if present
+    const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    return JSON.parse(cleanText) as T;
+  } catch (error) {
+    console.error("JSON Parse Error:", error);
+    return fallback;
+  }
+};
+
 export const createChatSession = (subjectTitle: string = 'فیزیک') => {
   return ai.chats.create({
     model: 'gemini-2.5-flash',
@@ -72,8 +85,7 @@ export const generateQuizQuestions = async (subjectTitle: string, chapter: strin
       }
     });
 
-    const jsonText = response.text || "[]";
-    return JSON.parse(jsonText) as QuizQuestion[];
+    return parseJson<QuizQuestion[]>(response.text, []);
   } catch (error) {
     console.error("Error generating quiz:", error);
     return [];
@@ -113,8 +125,7 @@ export const generateFlashcards = async (subjectTitle: string, chapter: string, 
       }
     });
 
-    const jsonText = response.text || "[]";
-    return JSON.parse(jsonText) as Flashcard[];
+    return parseJson<Flashcard[]>(response.text, []);
   } catch (error) {
     console.error("Error generating flashcards:", error);
     return [];
@@ -162,7 +173,7 @@ export const generateStepByStepExercises = async (subjectTitle: string, chapter:
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -170,8 +181,7 @@ export const generateStepByStepExercises = async (subjectTitle: string, chapter:
       }
     });
 
-    const jsonText = response.text || "[]";
-    return JSON.parse(jsonText) as StepByStepExercise[];
+    return parseJson<StepByStepExercise[]>(response.text, []);
   } catch (error) {
     console.error("Error generating exercises:", error);
     return [];
@@ -206,7 +216,7 @@ export const generateSampleQuestions = async (subjectTitle: string, chapter: str
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -214,8 +224,7 @@ export const generateSampleQuestions = async (subjectTitle: string, chapter: str
       }
     });
 
-    const jsonText = response.text || "[]";
-    return JSON.parse(jsonText) as SampleQuestion[];
+    return parseJson<SampleQuestion[]>(response.text, []);
   } catch (error) {
     console.error("Error generating sample questions:", error);
     return [];
@@ -244,7 +253,7 @@ export const solveProblem = async (subjectTitle: string, problemText: string, im
     });
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
+      model: 'gemini-2.5-flash', // Switched to Flash for reliability
       contents: { parts },
       config: {
         systemInstruction: getSolverInstruction(subjectTitle),
@@ -253,6 +262,6 @@ export const solveProblem = async (subjectTitle: string, problemText: string, im
     return response.text || "متاسفانه مشکلی در حل سوال پیش آمد.";
   } catch (error) {
     console.error("Error solving problem:", error);
-    return "خطا در ارتباط با هوش مصنوعی.";
+    return "خطا در ارتباط با هوش مصنوعی. لطفا دوباره تلاش کنید.";
   }
 };
