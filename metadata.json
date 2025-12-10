@@ -1,0 +1,7 @@
+{
+  "name": "فیزیک طلایی (Fizik Talaei)",
+  "description": "دستیار هوشمند آموزش فیزیک پایه دهم شامل گام‌به‌گام، آزمون تستی، و حل تمرین با هوش مصنوعی جمنای.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
