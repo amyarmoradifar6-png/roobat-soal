@@ -11,8 +11,16 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         <div className="w-32 h-32 bg-amber-500 rounded-3xl flex items-center justify-center text-7xl text-white shadow-2xl animate-float">
           G
         </div>
-        <div className="absolute -top-4 -right-4 text-4xl animate-bounce delay-100">✨</div>
-        <div className="absolute -bottom-4 -left-4 text-4xl animate-bounce delay-300">🎓</div>
+        
+        {/* Sparkle: White with shadow in Day mode, Amber in Night mode */}
+        <div className="absolute -top-4 -right-4 text-4xl animate-bounce delay-100 text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.2)] dark:text-amber-400 dark:drop-shadow-none">
+            ✨
+        </div>
+        
+        {/* Cap: Black in Day mode, White in Night mode */}
+        <div className="absolute -bottom-4 -left-4 text-4xl animate-bounce delay-300 text-slate-900 dark:text-slate-100">
+            🎓
+        </div>
       </div>
       
       <h1 className="text-4xl md:text-6xl font-black text-slate-800 dark:text-slate-100 mb-4 tracking-tight">

@@ -1,14 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
-import { SampleQuestion } from '../types';
+import { SampleQuestion, Subject } from '../types';
 import { generateSampleQuestions } from '../services/geminiService';
 
 interface SampleQuestionsInterfaceProps {
   initialChapter: string | null;
+  subject: Subject | null;
   onBack: () => void;
 }
 
-export const SampleQuestionsInterface: React.FC<SampleQuestionsInterfaceProps> = ({ initialChapter, onBack }) => {
+export const SampleQuestionsInterface: React.FC<SampleQuestionsInterfaceProps> = ({ initialChapter, subject, onBack }) => {
   const [questions, setQuestions] = useState<SampleQuestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -25,7 +25,8 @@ export const SampleQuestionsInterface: React.FC<SampleQuestionsInterfaceProps> =
     setLoading(true);
     setError(false);
     try {
-      const data = await generateSampleQuestions('درس', chapter);
+      const subjectName = subject ? subject.title : 'درس';
+      const data = await generateSampleQuestions(subjectName, chapter);
       if (data && data.length > 0) {
         setQuestions(data);
         setExpandedIndices([0]);

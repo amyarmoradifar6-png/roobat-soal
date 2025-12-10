@@ -1,14 +1,14 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { ChatMessage } from '../types';
+import { ChatMessage, Subject } from '../types';
 import { createChatSession } from '../services/geminiService';
 import { GenerateContentResponse } from '@google/genai';
 
 interface ChatInterfaceProps {
   initialPrompt?: string;
+  subject: Subject | null;
 }
 
-export const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialPrompt }) => {
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialPrompt, subject }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { id: '1', role: 'model', text: 'سلام! من دستیار آموزشی تو هستم. چطور می‌تونم امروز کمکت کنم؟' }
   ]);
@@ -20,11 +20,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialPrompt }) =
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Initialize session only once
+    // Initialize session only once, using subject if available
     if (!chatSessionRef.current) {
-      chatSessionRef.current = createChatSession('درس'); // Default generic subject
+      const subjectName = subject ? subject.title : 'درس';
+      chatSessionRef.current = createChatSession(subjectName);
     }
-  }, []);
+  }, [subject]);
 
   // Handle Initial Prompt (e.g., from Chapter Detail buttons)
   useEffect(() => {

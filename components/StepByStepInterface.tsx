@@ -1,14 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
-import { StepByStepExercise } from '../types';
+import { StepByStepExercise, Subject } from '../types';
 import { generateStepByStepExercises } from '../services/geminiService';
 
 interface StepByStepInterfaceProps {
   initialChapter: string | null;
+  subject: Subject | null;
   onBack: () => void;
 }
 
-export const StepByStepInterface: React.FC<StepByStepInterfaceProps> = ({ initialChapter, onBack }) => {
+export const StepByStepInterface: React.FC<StepByStepInterfaceProps> = ({ initialChapter, subject, onBack }) => {
   const [exercises, setExercises] = useState<StepByStepExercise[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -23,7 +23,8 @@ export const StepByStepInterface: React.FC<StepByStepInterfaceProps> = ({ initia
     setLoading(true);
     setError(false);
     try {
-      const data = await generateStepByStepExercises('درس', chapter);
+      const subjectName = subject ? subject.title : 'درس';
+      const data = await generateStepByStepExercises(subjectName, chapter);
       if (data && data.length > 0) {
         setExercises(data);
       } else {

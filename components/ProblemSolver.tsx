@@ -1,11 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { solveProblem } from '../services/geminiService';
+import { Subject } from '../types';
 
 interface ProblemSolverProps {
   onBack?: () => void;
+  subject: Subject | null;
 }
 
-export const ProblemSolver: React.FC<ProblemSolverProps> = ({ onBack }) => {
+export const ProblemSolver: React.FC<ProblemSolverProps> = ({ onBack, subject }) => {
   const [problem, setProblem] = useState('');
   const [solution, setSolution] = useState<string | null>(null);
   const [isSolving, setIsSolving] = useState(false);
@@ -115,9 +117,9 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({ onBack }) => {
     setIsSolving(true);
     setSolution(null);
     try {
+      const subjectName = subject ? subject.title : 'درس';
       const imageData = selectedImage ? { mimeType: selectedImage.mimeType, data: selectedImage.base64 } : undefined;
-      // We pass generic 'درس' as subject context if not prop-drilled, or the model figures it out.
-      const result = await solveProblem('درس', problem, imageData);
+      const result = await solveProblem(subjectName, problem, imageData);
       setSolution(result);
     } catch (e) {
       setSolution('متاسفانه خطایی در حل مسئله رخ داد. لطفا دوباره تلاش کنید.');
@@ -149,7 +151,9 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({ onBack }) => {
 
       <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 text-white shadow-lg">
         <h2 className="text-2xl font-bold mb-2">حل‌المسائل هوشمند</h2>
-        <p className="text-indigo-100">صورت سوال خود را بنویسید، بگویید یا عکس آن را آپلود کنید.</p>
+        <p className="text-indigo-100">
+           {subject ? `حل تمرین‌های ${subject.title}` : 'صورت سوال خود را بنویسید، بگویید یا عکس آن را آپلود کنید.'}
+        </p>
       </div>
 
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 transition-colors relative">

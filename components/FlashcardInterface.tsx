@@ -1,14 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
-import { Flashcard } from '../types';
+import { Flashcard, Subject } from '../types';
 import { generateFlashcards } from '../services/geminiService';
 
 interface FlashcardInterfaceProps {
   initialChapter: string | null;
+  subject: Subject | null;
   onBack: () => void;
 }
 
-export const FlashcardInterface: React.FC<FlashcardInterfaceProps> = ({ initialChapter, onBack }) => {
+export const FlashcardInterface: React.FC<FlashcardInterfaceProps> = ({ initialChapter, subject, onBack }) => {
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -25,7 +25,8 @@ export const FlashcardInterface: React.FC<FlashcardInterfaceProps> = ({ initialC
     setLoading(true);
     setError(false);
     try {
-      const generatedCards = await generateFlashcards('درس', chapter);
+      const subjectName = subject ? subject.title : 'درس';
+      const generatedCards = await generateFlashcards(subjectName, chapter);
       if (generatedCards && generatedCards.length > 0) {
         setCards(generatedCards);
         setCurrentIndex(0);

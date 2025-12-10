@@ -1,14 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
-import { QuizState } from '../types';
+import { QuizState, Subject } from '../types';
 import { generateQuizQuestions } from '../services/geminiService';
 
 interface QuizInterfaceProps {
   initialChapter?: string | null;
+  subject: Subject | null;
   onBack: () => void;
 }
 
-export const QuizInterface: React.FC<QuizInterfaceProps> = ({ initialChapter, onBack }) => {
+export const QuizInterface: React.FC<QuizInterfaceProps> = ({ initialChapter, subject, onBack }) => {
   const [loading, setLoading] = useState(false);
   const [state, setState] = useState<QuizState>({
     questions: [],
@@ -27,8 +27,8 @@ export const QuizInterface: React.FC<QuizInterfaceProps> = ({ initialChapter, on
 
   const startQuiz = async (chapter: string) => {
     setLoading(true);
-    // Note: Assuming 'درس' generic subject here, ideally prop drilled
-    const questions = await generateQuizQuestions('درس', chapter);
+    const subjectName = subject ? subject.title : 'درس';
+    const questions = await generateQuizQuestions(subjectName, chapter);
     setState({
       questions,
       currentIndex: 0,
@@ -169,7 +169,6 @@ export const QuizInterface: React.FC<QuizInterfaceProps> = ({ initialChapter, on
   }
 
   // Taking Quiz View
-  // Safety check although previous block covers it
   if (!state.questions[state.currentIndex]) return null;
   
   const currentQuestion = state.questions[state.currentIndex];

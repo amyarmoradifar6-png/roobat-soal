@@ -1,41 +1,50 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { QuizQuestion, Flashcard, StepByStepExercise, SampleQuestion } from "../types";
 
 // Initialize API Client
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-const getSystemInstruction = (subjectTitle: string) => `
-You are a friendly and expert ${subjectTitle} teacher for Grade 10 students in Iran. 
-Your tone is encouraging, clear, and educational.
-You communicate in Persian (Farsi).
-When solving problems, use the "Step-by-Step" (گام به گام) method:
-1. Identify the given data (داده‌های مسئله).
-2. Identify the unknown (مجهول).
-3. Select the appropriate formula or theorem.
-4. Perform the calculation or logical steps.
-5. State the final answer with units if applicable.
-Use LaTeX formatting for formulas if possible, or clear text representation.
-`;
-
-const getSolverInstruction = (subjectTitle: string) => `
-You are a "Homework Helper" for ${subjectTitle} Grade 10. 
-The user will provide a question. 
-You must output a detailed, step-by-step solution in Persian.
-Format clearly with bold headers for each step.
-`;
-
-// Helper to safely parse JSON from AI response
+// Robust JSON parser that extracts JSON array/object from text safely
 const parseJson = <T>(text: string | undefined, fallback: T): T => {
   if (!text) return fallback;
   try {
-    // Remove markdown code blocks if present
-    const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    // 1. Remove markdown code blocks
+    let cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    
+    // 2. Find the JSON array or object brackets
+    const firstBracket = cleanText.indexOf('[');
+    const firstBrace = cleanText.indexOf('{');
+    
+    let startIndex = -1;
+    let endIndex = -1;
+
+    // Determine if we are looking for array or object
+    if (firstBracket !== -1 && (firstBrace === -1 || firstBracket < firstBrace)) {
+        startIndex = firstBracket;
+        endIndex = cleanText.lastIndexOf(']');
+    } else if (firstBrace !== -1) {
+        startIndex = firstBrace;
+        endIndex = cleanText.lastIndexOf('}');
+    }
+
+    if (startIndex !== -1 && endIndex !== -1) {
+        cleanText = cleanText.substring(startIndex, endIndex + 1);
+    }
+
     return JSON.parse(cleanText) as T;
   } catch (error) {
     console.error("JSON Parse Error:", error);
+    // If parsing fails, try to return fallback, or maybe fix common JSON errors if needed
     return fallback;
   }
 };
+
+const getSystemInstruction = (subjectTitle: string) => `
+You are an expert ${subjectTitle} teacher for Grade 10 students in Iran.
+Language: Persian (Farsi).
+Method: Step-by-step, clear, encouraging.
+Use Persian digits (۰-۹) for numbers in text.
+`;
 
 export const createChatSession = (subjectTitle: string = 'فیزیک') => {
   return ai.chats.create({
@@ -47,33 +56,18 @@ export const createChatSession = (subjectTitle: string = 'فیزیک') => {
 };
 
 export const generateQuizQuestions = async (subjectTitle: string, chapter: string, count: number = 5): Promise<QuizQuestion[]> => {
-  const prompt = `Generate ${count} multiple-choice ${subjectTitle} questions for Grade 10 students in Iran.
-  Topic: ${chapter}.
-  Language: Persian (Farsi).
-  Style: Iranian Textbook (Grade 10).
-  Structure:
-  - Question text in Persian using Persian digits.
-  - 4 Persian options.
-  - Explanation using Iranian teaching terms.
-  Difficulty: Medium.`;
-
-  const schema = {
-    type: Type.ARRAY,
-    items: {
-      type: Type.OBJECT,
-      properties: {
-        question: { type: Type.STRING, description: "The conversational question text in Persian" },
-        options: { 
-          type: Type.ARRAY, 
-          items: { type: Type.STRING },
-          description: "Array of 4 options in Persian" 
-        },
-        correctIndex: { type: Type.INTEGER, description: "Index of the correct answer (0-3)" },
-        explanation: { type: Type.STRING, description: "Short explanation of the solution in Persian" }
-      },
-      required: ["question", "options", "correctIndex", "explanation"],
+  const prompt = `Generate ${count} multiple-choice questions for ${subjectTitle} Grade 10, Chapter: "${chapter}".
+  Language: Persian.
+  Format: JSON Array only.
+  
+  [
+    {
+      "question": "Question text...",
+      "options": ["Op1", "Op2", "Op3", "Op4"],
+      "correctIndex": 0,
+      "explanation": "Brief explanation..."
     }
-  };
+  ]`;
 
   try {
     const response = await ai.models.generateContent({
@@ -81,7 +75,6 @@ export const generateQuizQuestions = async (subjectTitle: string, chapter: strin
       contents: prompt,
       config: {
         responseMimeType: "application/json",
-        responseSchema: schema,
       }
     });
 
@@ -93,27 +86,16 @@ export const generateQuizQuestions = async (subjectTitle: string, chapter: strin
 };
 
 export const generateFlashcards = async (subjectTitle: string, chapter: string, count: number = 10): Promise<Flashcard[]> => {
-  const prompt = `Generate ${count} educational flashcards for ${subjectTitle} Grade 10, Topic: ${chapter}.
-  Language: Persian (Farsi).
-  Style: Iranian Curriculum (Ketab Darsi).
+  const prompt = `Create ${count} study flashcards for ${subjectTitle} Grade 10, Chapter: "${chapter}".
+  Language: Persian.
+  Format: JSON Array only.
   
-  CRITICAL INSTRUCTION:
-  - The 'front' should be a core Concept, Question, or Definition Request.
-  - The 'back' must be the precise definition, formula, or theorem used in Iranian schools.
-  - Keep it concise.
-  `;
-
-  const schema = {
-    type: Type.ARRAY,
-    items: {
-      type: Type.OBJECT,
-      properties: {
-        front: { type: Type.STRING, description: "The concept or question" },
-        back: { type: Type.STRING, description: "The answer or definition" },
-      },
-      required: ["front", "back"],
+  [
+    {
+      "front": "Concept",
+      "back": "Definition"
     }
-  };
+  ]`;
 
   try {
     const response = await ai.models.generateContent({
@@ -121,7 +103,6 @@ export const generateFlashcards = async (subjectTitle: string, chapter: string, 
       contents: prompt,
       config: {
         responseMimeType: "application/json",
-        responseSchema: schema,
       }
     });
 
@@ -133,43 +114,16 @@ export const generateFlashcards = async (subjectTitle: string, chapter: string, 
 };
 
 export const generateStepByStepExercises = async (subjectTitle: string, chapter: string): Promise<StepByStepExercise[]> => {
-  const prompt = `Act as a strict Iranian ${subjectTitle} Teacher for Grade 10.
-  Generate 3 standard textbook exercises for Chapter: "${chapter}".
-
-  RULES FOR CONTENT:
-  1.  **Context:** Use Iranian contexts.
-  2.  **Digits:** Use Persian Digits (۰-۹) in text.
-  3.  **Style:** Formal, educational, like a solution manual (Gam-be-Gam).
-
-  OUTPUT FORMAT (JSON):
-  Return an array of objects with 'question' and 'solution'.
-
-  SOLUTION STRUCTURE (Markdown):
-  The 'solution' string MUST follow this structure EXACTLY:
+  const prompt = `Generate 3 textbook-style exercises for ${subjectTitle} Grade 10, Chapter: "${chapter}".
+  Language: Persian.
+  Format: JSON Array only.
   
-  (Optional brief text analysis in Persian)
-
-  **فرمول / نکته:**
-  $$ [Formula/Theorem in LaTeX] $$
-
-  **جایگذاری و حل:**
-  $$ [Calculations in LaTeX] $$
-
-  **پاسخ نهایی:**
-  $$ [Final Answer in LaTeX] $$
-  `;
-
-  const schema = {
-    type: Type.ARRAY,
-    items: {
-      type: Type.OBJECT,
-      properties: {
-        question: { type: Type.STRING, description: "The problem text with Persian digits." },
-        solution: { type: Type.STRING, description: "Structured solution with headers: فرمول, جایگذاری, پاسخ نهایی." },
-      },
-      required: ["question", "solution"],
+  [
+    {
+      "question": "Problem text...",
+      "solution": "Step 1... \n\n **فرمول:** $$...$$ \n\n **محاسبه:** $$...$$"
     }
-  };
+  ]`;
 
   try {
     const response = await ai.models.generateContent({
@@ -177,7 +131,6 @@ export const generateStepByStepExercises = async (subjectTitle: string, chapter:
       contents: prompt,
       config: {
         responseMimeType: "application/json",
-        responseSchema: schema,
       }
     });
 
@@ -189,30 +142,16 @@ export const generateStepByStepExercises = async (subjectTitle: string, chapter:
 };
 
 export const generateSampleQuestions = async (subjectTitle: string, chapter: string): Promise<SampleQuestion[]> => {
-  const prompt = `Generate 5 standard descriptive/essay-type exam questions (سوالات تشریحی امتحانی) for ${subjectTitle} Grade 10 in Iran.
-  Chapter: "${chapter}".
-
-  STRICT CONTENT RULES:
-  1. **Style:** Formal, Academic, Serious (Like "Emtehan Nahaee" exams). 
-  2. **Language:** Persian (Farsi).
-  3. **Digits:** Use Persian Digits (۰-۹) in the text.
-  4. **Structure:**
-     - Question: A standard problem or definition request.
-     - Answer: A complete, descriptive answer including formulas if needed.
-  5. **Math:** Use LaTeX ($$ or $) for formulas.
-  `;
-
-  const schema = {
-    type: Type.ARRAY,
-    items: {
-      type: Type.OBJECT,
-      properties: {
-        question: { type: Type.STRING, description: "The exam question in formal Persian." },
-        answer: { type: Type.STRING, description: "The detailed answer in formal Persian." },
-      },
-      required: ["question", "answer"],
+  const prompt = `Generate 5 descriptive exam questions for ${subjectTitle} Grade 10, Chapter: "${chapter}".
+  Language: Persian.
+  Format: JSON Array only.
+  
+  [
+    {
+      "question": "Question...",
+      "answer": "Detailed answer..."
     }
-  };
+  ]`;
 
   try {
     const response = await ai.models.generateContent({
@@ -220,7 +159,6 @@ export const generateSampleQuestions = async (subjectTitle: string, chapter: str
       contents: prompt,
       config: {
         responseMimeType: "application/json",
-        responseSchema: schema,
       }
     });
 
@@ -245,18 +183,16 @@ export const solveProblem = async (subjectTitle: string, problemText: string, im
     }
 
     parts.push({
-      text: `Solve this ${subjectTitle} problem step-by-step in Persian (Farsi). 
-      Use Persian digits (۰-۹) in text.
-      Format with headers: "فرمول/نکته:", "حل مسئله:", "پاسخ:".
-      Enclose all math in $$...$$ for centered display.
-      Problem Context: ${problemText}`
+      text: `Solve this ${subjectTitle} problem step-by-step in Persian.
+      Problem: ${problemText}
+      Use LaTeX for math.`
     });
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash', // Switched to Flash for reliability
+      model: 'gemini-2.5-flash',
       contents: { parts },
       config: {
-        systemInstruction: getSolverInstruction(subjectTitle),
+        systemInstruction: getSystemInstruction(subjectTitle),
       }
     });
     return response.text || "متاسفانه مشکلی در حل سوال پیش آمد.";

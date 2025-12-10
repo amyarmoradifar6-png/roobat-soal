@@ -10,6 +10,18 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavigate, onChapterSelect, onBackToSubjects }) => {
+  
+  // Helper to assign different animations based on index to make the page feel "alive"
+  const getChapterAnimation = (index: number) => {
+    const animations = [
+      'animate-float',       // Up and down
+      'animate-wiggle',      // Rotation shake
+      'animate-heartbeat',   // Pulse scale
+      'animate-slide-slow',  // Diagonal slide
+    ];
+    return animations[index % animations.length];
+  };
+
   return (
     <div className="space-y-10 py-4 pb-20">
       {/* Back Button */}
@@ -42,9 +54,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
             className={`group bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] hover:shadow-xl dark:shadow-none border border-slate-100 dark:border-slate-800 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] active:scale-95 relative overflow-hidden cursor-pointer animate-fade-up delay-${Math.min((index + 2) * 100, 700)}`}
           >
             <div className="flex justify-between items-start mb-4">
-               {/* Icon */}
-              <div className={`w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-3xl transition-transform duration-300 group-hover:scale-110`}>
-                {chapter.icon}
+               {/* Icon with Animation & Night Glow */}
+               <div className={`w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-3xl transition-transform duration-300 group-hover:scale-110`}>
+                <span className={`
+                    ${getChapterAnimation(index)} 
+                    /* Dark Mode Glow Effect */
+                    dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.6)] 
+                    dark:filter
+                `}>
+                    {chapter.icon}
+                </span>
               </div>
               
               {/* Arrow Icon */}
@@ -84,7 +103,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
             className={`group bg-gradient-to-br ${subject.id === 'MATH' ? 'from-blue-600 to-indigo-700' : subject.id === 'CHEMISTRY' ? 'from-emerald-600 to-teal-700' : subject.id === 'GEOMETRY' ? 'from-rose-600 to-pink-700' : 'from-amber-500 to-orange-600'} rounded-3xl p-6 md:p-8 shadow-xl text-white cursor-pointer hover:-translate-y-1 hover:scale-[1.01] active:scale-95 transition-all duration-300 relative overflow-hidden md:col-span-2 flex flex-col md:flex-row items-center gap-6 animate-fade-up delay-300`}
           >
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl backdrop-blur-sm animate-[bounce_3s_infinite]">
-                🧮
+                <span className="drop-shadow-lg">🧮</span>
             </div>
             <div className="flex-1 text-center md:text-right">
                 <h3 className="text-xl font-bold mb-2">حل‌المسائل جامع</h3>
@@ -115,7 +134,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
                 className="bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg hover:scale-105 active:scale-95 transition-all group h-full animate-pop-in delay-100"
             >
                 <div className="w-16 h-16 bg-white dark:bg-sky-900 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
-                    🧩
+                    <span className="animate-spin-slow dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">🧩</span>
                 </div>
                 <div className="text-center">
                     <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">سودوکو</h3>
@@ -129,7 +148,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
                 className="bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg hover:scale-105 active:scale-95 transition-all group h-full animate-pop-in delay-200"
             >
                 <div className="w-16 h-16 bg-white dark:bg-rose-900 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
-                    🧠
+                    <span className="animate-pulse dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">🧠</span>
                 </div>
                 <div className="text-center">
                     <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">بازی حافظه</h3>
@@ -143,7 +162,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
                 className="bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg hover:scale-105 active:scale-95 transition-all group h-full animate-pop-in delay-300"
             >
                 <div className="w-16 h-16 bg-white dark:bg-orange-900 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
-                    🔡
+                    <span className="animate-wiggle dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">🔡</span>
                 </div>
                 <div className="text-center">
                     <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">حدس کلمه</h3>
@@ -151,13 +170,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
                 </div>
             </button>
 
-            {/* Liquid Sort Card - Changed Icon to 🥤 to distinguish from chemistry */}
+            {/* Liquid Sort Card */}
             <button 
                 onClick={() => onNavigate(ViewState.LIQUID_SORT)}
                 className="bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg hover:scale-105 active:scale-95 transition-all group h-full animate-pop-in delay-400"
             >
                 <div className="w-16 h-16 bg-white dark:bg-teal-900 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
-                    🥤
+                    <span className="animate-pour dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">🥤</span>
                 </div>
                 <div className="text-center">
                     <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">آزمایشگاه مایعات</h3>

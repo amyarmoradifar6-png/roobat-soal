@@ -48,17 +48,17 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, selectedSubject, on
           </div>
         </div>
 
-        {/* Theme Toggle */}
+        {/* Theme Toggle - High Contrast Style */}
         <button 
           onClick={toggleTheme} 
-          className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:scale-105 active:scale-95 transition-all z-20 relative"
+          className="p-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-105 active:scale-95 transition-all z-20 relative shadow-md"
           aria-label="Toggle theme"
         >
-           {/* In Day mode: Icon is Black (Moon). In Night mode: Icon is White (Sun). */}
+           {/* In Day mode (Black Button): Show White Moon. In Night mode (White Button): Show Black Sun. */}
           {isDark ? (
-            <span className="text-white text-xl">☀️</span>
+            <span className="text-xl">☀️</span>
           ) : (
-            <span className="text-black text-xl">🌙</span>
+            <span className="text-xl">🌙</span>
           )}
         </button>
       </header>
@@ -74,7 +74,7 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, selectedSubject, on
       <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 mt-auto">
         <div className="max-w-6xl mx-auto px-6 flex flex-col items-center gap-4">
             
-            {/* Group Name (Replaced Phone) - Bigger and Centered */}
+            {/* Group Name */}
             <div className="flex items-center gap-2">
                 <span className="text-slate-500 dark:text-slate-400 text-sm">
                     گروه:

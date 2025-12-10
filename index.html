@@ -14,6 +14,9 @@
               'float': 'float 3s ease-in-out infinite',
               'spark': 'spark 1.5s infinite',
               'pour': 'pour 2s ease-in-out infinite',
+              'wiggle': 'wiggle 3s ease-in-out infinite',
+              'heartbeat': 'heartbeat 2s ease-in-out infinite',
+              'slide-slow': 'slideSlow 4s ease-in-out infinite',
             },
             keyframes: {
               float: {
@@ -28,6 +31,18 @@
               pour: {
                 '0%, 100%': { transform: 'rotate(0deg)' },
                 '50%': { transform: 'rotate(15deg) translateX(2px)' }
+              },
+              wiggle: {
+                '0%, 100%': { transform: 'rotate(-6deg)' },
+                '50%': { transform: 'rotate(6deg)' }
+              },
+              heartbeat: {
+                '0%, 100%': { transform: 'scale(1)' },
+                '50%': { transform: 'scale(1.15)' }
+              },
+              slideSlow: {
+                '0%, 100%': { transform: 'translate(0, 0)' },
+                '50%': { transform: 'translate(5px, -5px)' }
               }
             }
           }

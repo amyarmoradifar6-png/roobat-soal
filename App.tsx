@@ -115,25 +115,25 @@ const App: React.FC = () => {
         );
 
       case ViewState.CHAT:
-        return <ChatInterface initialPrompt={initialChatPrompt} />;
+        return <ChatInterface initialPrompt={initialChatPrompt} subject={selectedSubject} />;
         
       case ViewState.QUIZ:
-        return <QuizInterface initialChapter={selectedChapterId} onBack={handleBackToDetail} />;
+        return <QuizInterface subject={selectedSubject} initialChapter={selectedChapterId} onBack={handleBackToDetail} />;
         
       case ViewState.FLASHCARD:
-        return <FlashcardInterface initialChapter={selectedChapterId} onBack={handleBackToDetail} />;
+        return <FlashcardInterface subject={selectedSubject} initialChapter={selectedChapterId} onBack={handleBackToDetail} />;
 
       case ViewState.STEP_BY_STEP:
-        return <StepByStepInterface initialChapter={selectedChapterId} onBack={handleBackToDetail} />;
+        return <StepByStepInterface subject={selectedSubject} initialChapter={selectedChapterId} onBack={handleBackToDetail} />;
 
       case ViewState.SAMPLE_QUESTIONS:
-        return <SampleQuestionsInterface initialChapter={selectedChapterId} onBack={handleBackToDetail} />;
+        return <SampleQuestionsInterface subject={selectedSubject} initialChapter={selectedChapterId} onBack={handleBackToDetail} />;
 
       case ViewState.SOLVER:
         // Solver can be accessed from Dashboard (no chapter selected) or detail.
         // If accessed from Dashboard, back button goes to Dashboard.
         const handleSolverBack = selectedChapterId ? handleBackToDetail : handleBackToDashboard;
-        return <ProblemSolver onBack={handleSolverBack} />;
+        return <ProblemSolver subject={selectedSubject} onBack={handleSolverBack} />;
 
       case ViewState.SUDOKU:
         return <SudokuGame onBack={handleBackToDashboard} />;
