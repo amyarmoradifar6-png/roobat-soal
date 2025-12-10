@@ -1,5 +1,4 @@
-
-import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { QuizQuestion, Flashcard, StepByStepExercise, SampleQuestion } from "../types";
 
 // Initialize API Client
@@ -45,7 +44,7 @@ export const generateQuizQuestions = async (subjectTitle: string, chapter: strin
   - Explanation using Iranian teaching terms.
   Difficulty: Medium.`;
 
-  const schema: Schema = {
+  const schema = {
     type: Type.ARRAY,
     items: {
       type: Type.OBJECT,
@@ -92,7 +91,7 @@ export const generateFlashcards = async (subjectTitle: string, chapter: string, 
   - Keep it concise.
   `;
 
-  const schema: Schema = {
+  const schema = {
     type: Type.ARRAY,
     items: {
       type: Type.OBJECT,
@@ -149,7 +148,7 @@ export const generateStepByStepExercises = async (subjectTitle: string, chapter:
   $$ [Final Answer in LaTeX] $$
   `;
 
-  const schema: Schema = {
+  const schema = {
     type: Type.ARRAY,
     items: {
       type: Type.OBJECT,
@@ -163,7 +162,7 @@ export const generateStepByStepExercises = async (subjectTitle: string, chapter:
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-pro-preview',
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -193,7 +192,7 @@ export const generateSampleQuestions = async (subjectTitle: string, chapter: str
   5. **Math:** Use LaTeX ($$ or $) for formulas.
   `;
 
-  const schema: Schema = {
+  const schema = {
     type: Type.ARRAY,
     items: {
       type: Type.OBJECT,
@@ -207,7 +206,7 @@ export const generateSampleQuestions = async (subjectTitle: string, chapter: str
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-pro-preview',
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -245,7 +244,7 @@ export const solveProblem = async (subjectTitle: string, problemText: string, im
     });
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-pro-preview',
       contents: { parts },
       config: {
         systemInstruction: getSolverInstruction(subjectTitle),

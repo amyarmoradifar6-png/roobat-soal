@@ -108,7 +108,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialPrompt }) =
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] md:h-[calc(100vh-100px)] bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
+    <div className="flex flex-col h-[calc(100vh-140px)] md:h-[calc(100vh-100px)] bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors animate-fade-up">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg) => (
           <div
@@ -116,10 +116,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialPrompt }) =
             className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}
           >
             <div
-              className={`max-w-[85%] rounded-2xl p-4 whitespace-pre-wrap leading-relaxed ${
+              className={`max-w-[85%] rounded-2xl p-4 whitespace-pre-wrap leading-relaxed shadow-sm ${
                 msg.role === 'user'
-                  ? 'bg-indigo-600 dark:bg-indigo-700 text-white rounded-tr-sm'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-sm'
+                  ? 'bg-indigo-600 dark:bg-indigo-700 text-white rounded-tr-sm animate-slide-in-right'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-sm animate-slide-in-left'
               }`}
             >
               {msg.text || (msg.isLoading && <span className="animate-pulse">در حال نوشتن...</span>)}

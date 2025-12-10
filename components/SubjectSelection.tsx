@@ -9,9 +9,9 @@ interface SubjectSelectionProps {
 
 export const SubjectSelection: React.FC<SubjectSelectionProps> = ({ onSelectSubject }) => {
   return (
-    <div className="space-y-10 py-8 pb-20 animate-in fade-in duration-500">
+    <div className="space-y-10 py-8 pb-20">
       {/* Hero Section */}
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-4 animate-fade-up">
         <h1 className="text-3xl md:text-5xl font-black text-slate-800 dark:text-slate-100">
           دستیار هوشمند <span className="text-amber-500">گام‌به‌گام</span>
         </h1>
@@ -22,11 +22,12 @@ export const SubjectSelection: React.FC<SubjectSelectionProps> = ({ onSelectSubj
 
       {/* Subjects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        {SUBJECTS.map((subject) => (
+        {SUBJECTS.map((subject, index) => (
           <button
             key={subject.id}
             onClick={() => onSelectSubject(subject)}
-            className={`group bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] hover:shadow-xl dark:shadow-none border-2 border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden text-right`}
+            className={`group bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] hover:shadow-xl dark:shadow-none border-2 border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden text-right animate-fade-up delay-${(index + 1) * 100}`}
+            style={{ animationFillMode: 'both' }}
           >
             <div className="flex justify-between items-start mb-4">
                {/* Icon */}

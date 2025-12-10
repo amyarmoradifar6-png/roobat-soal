@@ -46,8 +46,8 @@ export const ChapterDetail: React.FC<ChapterDetailProps> = ({ chapterId, chapter
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] py-8 animate-in fade-in zoom-in-95 duration-300">
-      <div className="text-center mb-12 space-y-4">
+    <div className="flex flex-col items-center justify-center min-h-[60vh] py-8">
+      <div className="text-center mb-12 space-y-4 animate-fade-up">
         <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100">
           برای <span className="text-indigo-600 dark:text-indigo-400">{displayTitle}</span> چه کاری انجام بدیم؟
         </h2>
@@ -58,7 +58,7 @@ export const ChapterDetail: React.FC<ChapterDetailProps> = ({ chapterId, chapter
           <button
             key={idx}
             onClick={card.action}
-            className="flex flex-col items-center text-center bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group"
+            className={`flex flex-col items-center text-center bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group animate-pop-in delay-${(idx + 1) * 100}`}
           >
             <div className={`w-20 h-20 ${card.color} dark:bg-opacity-20 rounded-full flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform`}>
               {card.icon}
@@ -71,7 +71,7 @@ export const ChapterDetail: React.FC<ChapterDetailProps> = ({ chapterId, chapter
 
       <button
         onClick={onBack}
-        className="mt-16 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors flex items-center gap-2 text-sm font-medium"
+        className="mt-16 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors flex items-center gap-2 text-sm font-medium animate-fade-up delay-500"
       >
         <span>انتخاب فصل دیگر</span>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
