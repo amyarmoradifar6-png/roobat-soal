@@ -11,13 +11,14 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavigate, onChapterSelect, onBackToSubjects }) => {
   
-  // Helper to assign different animations based on index to make the page feel "alive"
+  // Specific animations for each index to make them distinct and alive
   const getChapterAnimation = (index: number) => {
     const animations = [
-      'animate-float',       // Up and down
-      'animate-wiggle',      // Rotation shake
-      'animate-heartbeat',   // Pulse scale
-      'animate-slide-slow',  // Diagonal slide
+      'animate-float',       // 0: Float up/down
+      'animate-wiggle',      // 1: Rotate slightly
+      'animate-heartbeat',   // 2: Pulse
+      'animate-pour',        // 3: Tilt
+      'animate-slide-slow',  // 4: Slide
     ];
     return animations[index % animations.length];
   };
@@ -54,12 +55,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
             className={`group bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] hover:shadow-xl dark:shadow-none border border-slate-100 dark:border-slate-800 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] active:scale-95 relative overflow-hidden cursor-pointer animate-fade-up delay-${Math.min((index + 2) * 100, 700)}`}
           >
             <div className="flex justify-between items-start mb-4">
-               {/* Icon with Animation & Night Glow */}
-               <div className={`w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-3xl transition-transform duration-300 group-hover:scale-110`}>
+               {/* Icon Container */}
+               <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-4xl transition-transform duration-300 group-hover:scale-110">
+                {/* 
+                    Icon Logic:
+                    1. Animation: Assigned via getChapterAnimation (float, wiggle, etc.)
+                    2. Night Glow: 'dark:drop-shadow...' adds a glow ONLY in dark mode.
+                    3. Day Mode: No filter/glow applied.
+                */}
                 <span className={`
+                    inline-block
                     ${getChapterAnimation(index)} 
-                    /* Dark Mode Glow Effect */
-                    dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.6)] 
+                    dark:text-white
+                    dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]
                     dark:filter
                 `}>
                     {chapter.icon}
@@ -92,7 +100,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
                   {tag}
                 </span>
               ))}
-              <span className="px-2 py-1.5 text-slate-400 text-xs">...</span>
             </div>
           </div>
         ))}
@@ -128,59 +135,51 @@ export const Dashboard: React.FC<DashboardProps> = ({ subject, chapters, onNavig
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Sudoku Card */}
             <button 
                 onClick={() => onNavigate(ViewState.SUDOKU)}
                 className="bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg hover:scale-105 active:scale-95 transition-all group h-full animate-pop-in delay-100"
             >
                 <div className="w-16 h-16 bg-white dark:bg-sky-900 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
-                    <span className="animate-spin-slow dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">🧩</span>
+                    <span className="animate-spin-slow dark:text-white dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]">🧩</span>
                 </div>
                 <div className="text-center">
                     <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">سودوکو</h3>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">تقویت منطق و تمرکز</p>
                 </div>
             </button>
 
-            {/* Memory Game Card */}
             <button 
                 onClick={() => onNavigate(ViewState.MEMORY_GAME)}
                 className="bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg hover:scale-105 active:scale-95 transition-all group h-full animate-pop-in delay-200"
             >
                 <div className="w-16 h-16 bg-white dark:bg-rose-900 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
-                    <span className="animate-pulse dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">🧠</span>
+                    <span className="animate-pulse dark:text-white dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]">🧠</span>
                 </div>
                 <div className="text-center">
-                    <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">بازی حافظه</h3>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">تقویت حافظه تصویری</p>
+                    <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">حافظه</h3>
                 </div>
             </button>
 
-            {/* Word Guess Card */}
             <button 
                 onClick={() => onNavigate(ViewState.WORD_GUESS)}
                 className="bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg hover:scale-105 active:scale-95 transition-all group h-full animate-pop-in delay-300"
             >
                 <div className="w-16 h-16 bg-white dark:bg-orange-900 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
-                    <span className="animate-wiggle dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">🔡</span>
+                    <span className="animate-wiggle dark:text-white dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]">🔡</span>
                 </div>
                 <div className="text-center">
                     <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">حدس کلمه</h3>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">واژگان علمی رو پیدا کن!</p>
                 </div>
             </button>
 
-            {/* Liquid Sort Card */}
             <button 
                 onClick={() => onNavigate(ViewState.LIQUID_SORT)}
                 className="bg-teal-50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800 p-6 rounded-3xl flex flex-col items-center gap-4 hover:shadow-lg hover:scale-105 active:scale-95 transition-all group h-full animate-pop-in delay-400"
             >
                 <div className="w-16 h-16 bg-white dark:bg-teal-900 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
-                    <span className="animate-pour dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">🥤</span>
+                    <span className="animate-pour dark:text-white dark:drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]">🥤</span>
                 </div>
                 <div className="text-center">
-                    <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">آزمایشگاه مایعات</h3>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">جداسازی مواد شیمیایی</p>
+                    <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">مایعات</h3>
                 </div>
             </button>
         </div>
