@@ -27,6 +27,11 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, selectedSubject, on
      logo: 'G'
   };
 
+  const handleLinkClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    alert('این آدرس وب‌سایت در حال حاضر نمایشی است و هنوز ثبت نهایی نشده است.\n(This is a demo URL)');
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300 font-[Vazirmatn]">
       {/* Header */}
@@ -76,9 +81,8 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, selectedSubject, on
             
             {/* Website Address (Right side in RTL) */}
             <a 
-              href="https://www.dastyartalaei.ir" 
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#" 
+              onClick={handleLinkClick}
               className="text-slate-400 hover:text-indigo-600 dark:text-slate-500 dark:hover:text-indigo-400 text-sm font-mono tracking-wider transition-colors"
             >
                 www.dastyartalaei.ir
