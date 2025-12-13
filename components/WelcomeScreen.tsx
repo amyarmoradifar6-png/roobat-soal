@@ -24,7 +24,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
       </div>
       
       <h1 className="text-4xl md:text-6xl font-black text-slate-800 dark:text-slate-100 mb-4 tracking-tight">
-        فیزیک <span className="text-amber-500">طلایی</span>
+        دستیار <span className="text-amber-500">طلایی</span>
       </h1>
       
       <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-md mb-12 leading-relaxed">

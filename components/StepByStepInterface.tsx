@@ -37,37 +37,69 @@ export const StepByStepInterface: React.FC<StepByStepInterfaceProps> = ({ initia
     }
   };
 
-  // Helper to render text mixed with LaTeX (Inline $...$ and Block $$...$$)
+  // Helper to convert English digits to Persian digits for TEXT only
+  const toPersianDigits = (str: string) => {
+    return str.replace(/[0-9]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
+  };
+
+  // Helper to process text: fixes raw LaTeX leakage and formats content
+  const processText = (text: string) => {
+    if (!text) return '';
+    
+    // 1. Attempt to fix common raw LaTeX patterns that aren't wrapped in $
+    // Replaces cases like "frac{...}{...}" with "$$\frac{...}{...}$$" if not already wrapped
+    // This is a heuristic fix for the "frac" issue seen in the screenshot.
+    let processed = text;
+    
+    // If text contains latex commands but no $, wrap lines
+    const hasLatex = /\\(frac|times|text|sqrt|hat|vec|sin|cos)/.test(processed);
+    const hasDelimiters = /\$|\\\[/.test(processed);
+
+    if (hasLatex && !hasDelimiters) {
+        // Aggressively wrap things that look like math lines
+        const lines = processed.split('\n');
+        processed = lines.map(line => {
+             if (/\\(frac|times|text|sqrt)/.test(line)) {
+                 return `$$ ${line} $$`;
+             }
+             return line;
+        }).join('\n');
+    }
+
+    return processed;
+  };
+
+  // Helper to render text mixed with LaTeX
   const renderContent = (text: string) => {
     if (!text) return null;
-
-    // First split by block math $$...$$
-    const blockParts = text.split(/\$\$(.*?)\$\$/g);
+    const cleanText = processText(text);
+    
+    const blockParts = cleanText.split(/\$\$(.*?)\$\$/g);
 
     return blockParts.map((blockPart, blockIndex) => {
-      // Odd indices in blockParts are Block Math ($$)
+      // Block Math
       if (blockIndex % 2 === 1) {
         if ((window as any).katex) {
           try {
             const html = (window as any).katex.renderToString(blockPart, {
               throwOnError: false,
-              displayMode: true, // Center align
+              displayMode: true,
               output: 'html',
             });
-            return <div key={`block-${blockIndex}`} className="my-2" dangerouslySetInnerHTML={{ __html: html }} />;
+            return <div key={`block-${blockIndex}`} className="my-3 py-2 overflow-x-auto" dir="ltr" dangerouslySetInnerHTML={{ __html: html }} />;
           } catch (e) {
-            return <div key={`block-${blockIndex}`} className="my-2 text-center code">{blockPart}</div>;
+            return <div key={`block-${blockIndex}`} className="my-2 text-center code font-mono text-sm bg-gray-100 p-1 rounded" dir="ltr">{blockPart}</div>;
           }
         } else {
-          return <div key={`block-${blockIndex}`} className="my-2 text-center code">{blockPart}</div>;
+          return <div key={`block-${blockIndex}`} className="my-2 text-center code" dir="ltr">{blockPart}</div>;
         }
       }
 
-      // Even indices are text which might contain inline math $...$
+      // Text mixed with Inline Math
       const inlineParts = blockPart.split(/\$(.*?)\$/g);
       
       return (
-        <span key={`text-${blockIndex}`}>
+        <span key={`text-${blockIndex}`} className="leading-loose">
           {inlineParts.map((part, inlineIndex) => {
             if (inlineIndex % 2 === 1) {
               // Inline Math
@@ -78,7 +110,7 @@ export const StepByStepInterface: React.FC<StepByStepInterfaceProps> = ({ initia
                     displayMode: false,
                     output: 'html',
                   });
-                  return <span key={`inline-${inlineIndex}`} className="mx-1 text-emerald-800 dark:text-emerald-300 font-bold" dangerouslySetInnerHTML={{ __html: html }} />;
+                  return <span key={`inline-${inlineIndex}`} className="mx-1 inline-block text-indigo-800 dark:text-indigo-300 font-bold" dir="ltr" dangerouslySetInnerHTML={{ __html: html }} />;
                 } catch (e) {
                   return <code key={`inline-${inlineIndex}`} className="mx-1 bg-slate-100 dark:bg-slate-800 px-1 rounded dir-ltr">{part}</code>;
                 }
@@ -86,16 +118,15 @@ export const StepByStepInterface: React.FC<StepByStepInterfaceProps> = ({ initia
               return <code key={`inline-${inlineIndex}`}>{part}</code>;
             }
             
-            // Plain text
-            if (part.includes('فرمول:') || part.includes('جایگذاری و محاسبات:') || part.includes('پاسخ نهایی:')) {
-               return (
-                 <span key={`plain-${inlineIndex}`} className="font-bold text-slate-800 dark:text-slate-100 block mt-4 mb-2">
-                   {part}
-                 </span>
-               );
+            // Plain text formatting
+            if (!part.trim()) return null;
+
+            // Check for bold headers
+            if (part.includes('فرمول:') || part.includes('محاسبه:') || part.includes('پاسخ:')) {
+                return <strong key={`plain-${inlineIndex}`} className="block mt-4 mb-2 text-emerald-700 dark:text-emerald-400 text-lg border-b border-emerald-100 dark:border-emerald-900 w-fit pb-1">{toPersianDigits(part)}</strong>;
             }
 
-            return <span key={`plain-${inlineIndex}`}>{part}</span>;
+            return <span key={`plain-${inlineIndex}`}>{toPersianDigits(part)}</span>;
           })}
         </span>
       );
@@ -106,8 +137,8 @@ export const StepByStepInterface: React.FC<StepByStepInterfaceProps> = ({ initia
     return (
       <div className="flex flex-col items-center justify-center h-full py-20 text-center animate-in fade-in duration-500">
         <div className="w-16 h-16 border-4 border-emerald-200 dark:border-emerald-800 border-t-emerald-600 dark:border-t-emerald-400 rounded-full animate-spin mb-4"></div>
-        <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200">در حال استخراج تمرینات مهم...</h3>
-        <p className="text-slate-500 mt-2">لطفا صبر کنید</p>
+        <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200">در حال نوشتن گام‌به‌گام...</h3>
+        <p className="text-slate-500 mt-2">دقیقاً مثل کتاب درسی</p>
       </div>
     );
   }
@@ -130,12 +161,11 @@ export const StepByStepInterface: React.FC<StepByStepInterfaceProps> = ({ initia
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-slate-200 dark:border-slate-800 pb-6">
         <div>
            <div className="flex items-center gap-2 mb-1">
-             <span className="text-emerald-600 dark:text-emerald-400 font-bold text-sm tracking-wide">آموزش تشریحی</span>
+             <span className="text-emerald-600 dark:text-emerald-400 font-bold text-sm tracking-wide bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1 rounded-full">آموزش تشریحی</span>
            </div>
-           <h2 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-slate-100">
+           <h2 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-slate-100 mt-2">
              گام به گام: {initialChapter}
            </h2>
-           <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">پاسخ تشریحی تمرینات مهم کتاب درسی</p>
         </div>
         <button 
             onClick={onBack}
@@ -154,26 +184,24 @@ export const StepByStepInterface: React.FC<StepByStepInterfaceProps> = ({ initia
           <div key={idx} className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
              
              {/* Question Section */}
-             <div className="p-6 md:p-8 relative">
-                <div className="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-500 text-sm">
+             <div className="p-6 md:p-8 relative bg-gradient-to-l from-slate-50 to-white dark:from-slate-900 dark:to-slate-900">
+                <div className="absolute top-6 right-6 w-8 h-8 rounded-lg bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-slate-300 dark:shadow-none">
                   {idx + 1}
                 </div>
-                <div className="pr-12">
-                   <h3 className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 leading-loose">
+                <div className="pr-12 text-justify">
+                   <div className="text-lg md:text-xl font-bold text-slate-800 dark:text-slate-100 leading-9">
                      {renderContent(exercise.question)}
-                   </h3>
+                   </div>
                 </div>
              </div>
 
-             {/* Solution Section (Green Box style) */}
-             <div className="bg-emerald-50 dark:bg-emerald-900/10 p-6 md:p-8 border-t border-emerald-100 dark:border-emerald-800/50">
-                <div className="flex items-center gap-2 mb-6 text-emerald-700 dark:text-emerald-400 font-bold text-lg border-b border-emerald-200 dark:border-emerald-800 pb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>پاسخ تشریحی:</span>
+             {/* Solution Section (Book Style) */}
+             <div className="bg-white dark:bg-slate-900 p-6 md:p-8 border-t-2 border-dashed border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-2 mb-6">
+                    <div className="w-1 h-6 bg-emerald-500 rounded-full"></div>
+                    <span className="text-emerald-700 dark:text-emerald-400 font-bold text-lg">پاسخ تشریحی</span>
                 </div>
-                <div className="text-slate-700 dark:text-slate-300 leading-loose">
+                <div className="text-slate-700 dark:text-slate-300 leading-9 text-justify text-lg space-y-4">
                     {renderContent(exercise.solution)}
                 </div>
              </div>

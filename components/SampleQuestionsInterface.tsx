@@ -64,9 +64,19 @@ export const SampleQuestionsInterface: React.FC<SampleQuestionsInterfaceProps> =
       window.speechSynthesis.speak(utterance);
   };
 
+  const toPersianDigits = (str: string) => str.replace(/[0-9]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
+
   const renderContent = (text: string) => {
     if (!text) return null;
-    const blockParts = text.split(/\$\$(.*?)\$\$/g);
+
+    // Heuristic: Wrap raw LaTeX lines in $$ if they look like math but aren't wrapped
+    let processed = text;
+    if (!/\$|\\\[/.test(processed) && /\\(frac|times|text)/.test(processed)) {
+       const lines = processed.split('\n');
+       processed = lines.map(line => /\\(frac|times|text)/.test(line) ? `$$ ${line} $$` : line).join('\n');
+    }
+
+    const blockParts = processed.split(/\$\$(.*?)\$\$/g);
     return blockParts.map((blockPart, blockIndex) => {
       if (blockIndex % 2 === 1) {
         if ((window as any).katex) {
@@ -76,13 +86,13 @@ export const SampleQuestionsInterface: React.FC<SampleQuestionsInterfaceProps> =
               displayMode: true,
               output: 'html',
             });
-            return <div key={`block-${blockIndex}`} className="my-2" dangerouslySetInnerHTML={{ __html: html }} />;
-          } catch (e) { return <div key={`block-${blockIndex}`} className="my-2 text-center code">{blockPart}</div>; }
+            return <div key={`block-${blockIndex}`} className="my-3 py-2 overflow-x-auto" dir="ltr" dangerouslySetInnerHTML={{ __html: html }} />;
+          } catch (e) { return <div key={`block-${blockIndex}`} className="my-2 text-center code font-mono text-sm bg-gray-100 p-1 rounded" dir="ltr">{blockPart}</div>; }
         } else { return <div key={`block-${blockIndex}`} className="my-2 text-center code">{blockPart}</div>; }
       }
       const inlineParts = blockPart.split(/\$(.*?)\$/g);
       return (
-        <span key={`text-${blockIndex}`}>
+        <span key={`text-${blockIndex}`} className="leading-loose">
           {inlineParts.map((part, inlineIndex) => {
             if (inlineIndex % 2 === 1) {
               if ((window as any).katex) {
@@ -92,12 +102,12 @@ export const SampleQuestionsInterface: React.FC<SampleQuestionsInterfaceProps> =
                     displayMode: false,
                     output: 'html',
                   });
-                  return <span key={`inline-${inlineIndex}`} className="mx-1 font-bold text-indigo-700 dark:text-indigo-300" dangerouslySetInnerHTML={{ __html: html }} />;
+                  return <span key={`inline-${inlineIndex}`} className="mx-1 font-bold text-purple-700 dark:text-purple-300 inline-block" dir="ltr" dangerouslySetInnerHTML={{ __html: html }} />;
                 } catch (e) { return <code key={`inline-${inlineIndex}`} className="mx-1 bg-slate-100 dark:bg-slate-800 px-1 rounded dir-ltr">{part}</code>; }
               }
               return <code key={`inline-${inlineIndex}`}>{part}</code>;
             }
-            return <span key={`plain-${inlineIndex}`}>{part}</span>;
+            return <span key={`plain-${inlineIndex}`}>{toPersianDigits(part)}</span>;
           })}
         </span>
       );
@@ -158,10 +168,10 @@ export const SampleQuestionsInterface: React.FC<SampleQuestionsInterfaceProps> =
             <div key={idx} className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300">
                <div onClick={() => toggleQuestion(idx)} className="p-6 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors flex items-start gap-4">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 flex items-center justify-center font-bold text-sm mt-1">
-                    {idx + 1}
+                    {toPersianDigits((idx + 1).toString())}
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 leading-relaxed">
+                  <div className="flex-1 text-justify">
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 leading-9">
                        {renderContent(q.question)}
                     </h3>
                   </div>
@@ -176,7 +186,7 @@ export const SampleQuestionsInterface: React.FC<SampleQuestionsInterfaceProps> =
                     </svg>
                   </div>
                </div>
-               <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+               <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
                   <div className="p-6 pt-0">
                     <div className="bg-purple-50 dark:bg-purple-900/20 rounded-2xl p-6 border border-purple-100 dark:border-purple-800/30">
                        <div className="flex items-center justify-between mb-4">
@@ -189,7 +199,7 @@ export const SampleQuestionsInterface: React.FC<SampleQuestionsInterfaceProps> =
                                 </svg>
                             </button>
                        </div>
-                       <div className="prose prose-purple dark:prose-invert max-w-none whitespace-pre-wrap leading-loose text-slate-700 dark:text-slate-300">
+                       <div className="text-slate-700 dark:text-slate-300 leading-9 text-justify text-lg space-y-4">
                           {renderContent(q.answer)}
                        </div>
                     </div>

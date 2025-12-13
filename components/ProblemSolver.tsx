@@ -16,9 +16,20 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({ onBack, subject })
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Convert English text digits to Persian for description text
+  const toPersianDigits = (str: string) => str.replace(/[0-9]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
+
   const renderContent = (text: string) => {
     if (!text) return null;
-    const blockParts = text.split(/\$\$(.*?)\$\$/g);
+
+    // Heuristic: Wrap raw LaTeX lines in $$ if they look like math but aren't wrapped
+    let processed = text;
+    if (!/\$|\\\[/.test(processed) && /\\(frac|times|text)/.test(processed)) {
+       const lines = processed.split('\n');
+       processed = lines.map(line => /\\(frac|times|text)/.test(line) ? `$$ ${line} $$` : line).join('\n');
+    }
+
+    const blockParts = processed.split(/\$\$(.*?)\$\$/g);
     return blockParts.map((blockPart, blockIndex) => {
       if (blockIndex % 2 === 1) {
         if ((window as any).katex) {
@@ -28,13 +39,13 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({ onBack, subject })
               displayMode: true,
               output: 'html',
             });
-            return <div key={`block-${blockIndex}`} className="my-2" dangerouslySetInnerHTML={{ __html: html }} />;
-          } catch (e) { return <div key={`block-${blockIndex}`} className="my-2 text-center code">{blockPart}</div>; }
+            return <div key={`block-${blockIndex}`} className="my-4 py-2 overflow-x-auto" dir="ltr" dangerouslySetInnerHTML={{ __html: html }} />;
+          } catch (e) { return <div key={`block-${blockIndex}`} className="my-2 text-center code font-mono text-sm bg-gray-100 p-2 rounded" dir="ltr">{blockPart}</div>; }
         } else { return <div key={`block-${blockIndex}`} className="my-2 text-center code">{blockPart}</div>; }
       }
       const inlineParts = blockPart.split(/\$(.*?)\$/g);
       return (
-        <span key={`text-${blockIndex}`}>
+        <span key={`text-${blockIndex}`} className="leading-loose">
           {inlineParts.map((part, inlineIndex) => {
             if (inlineIndex % 2 === 1) {
               if ((window as any).katex) {
@@ -44,15 +55,15 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({ onBack, subject })
                     displayMode: false,
                     output: 'html',
                   });
-                  return <span key={`inline-${inlineIndex}`} className="mx-1 font-bold text-indigo-700 dark:text-indigo-300" dangerouslySetInnerHTML={{ __html: html }} />;
+                  return <span key={`inline-${inlineIndex}`} className="mx-1 font-bold text-indigo-700 dark:text-indigo-300 inline-block" dir="ltr" dangerouslySetInnerHTML={{ __html: html }} />;
                 } catch (e) { return <code key={`inline-${inlineIndex}`} className="mx-1 bg-slate-100 dark:bg-slate-800 px-1 rounded dir-ltr">{part}</code>; }
               }
               return <code key={`inline-${inlineIndex}`}>{part}</code>;
             }
-            if (part.includes('فرمول:') || part.includes('جایگذاری و محاسبات:') || part.includes('پاسخ:')) {
-               return <strong key={`plain-${inlineIndex}`} className="block mt-4 mb-2 text-indigo-700 dark:text-indigo-400 text-lg">{part}</strong>;
+            if (part.includes('فرمول:') || part.includes('جایگذاری') || part.includes('پاسخ:')) {
+               return <strong key={`plain-${inlineIndex}`} className="block mt-6 mb-2 text-indigo-700 dark:text-indigo-400 text-xl border-b border-indigo-100 dark:border-slate-700 pb-2">{toPersianDigits(part)}</strong>;
             }
-            return <span key={`plain-${inlineIndex}`}>{part}</span>;
+            return <span key={`plain-${inlineIndex}`}>{toPersianDigits(part)}</span>;
           })}
         </span>
       );
@@ -160,7 +171,7 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({ onBack, subject })
         <textarea
           value={problem}
           onChange={(e) => setProblem(e.target.value)}
-          placeholder="مسئله خود را تایپ کنید یا دکمه میکروفون را بزنید..."
+          placeholder="مسئله خود را تایپ کنید..."
           className="w-full h-32 p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 dark:focus:border-purple-400 resize-none transition-all placeholder-slate-400 dark:placeholder-slate-500"
         />
         
@@ -197,7 +208,7 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({ onBack, subject })
             {isSolving ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                <span>در حال حل مسئله...</span>
+                <span>در حال حل...</span>
               </>
             ) : (
               <>
@@ -213,7 +224,7 @@ export const ProblemSolver: React.FC<ProblemSolverProps> = ({ onBack, subject })
 
       {solution && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 animate-in fade-in slide-in-from-bottom-4 duration-500 transition-colors">
-           <div className="prose prose-purple dark:prose-invert max-w-none whitespace-pre-wrap leading-loose text-slate-700 dark:text-slate-300">
+           <div className="text-slate-700 dark:text-slate-300">
              {renderContent(solution)}
            </div>
         </div>

@@ -72,41 +72,26 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, selectedSubject, on
 
       {/* Footer / Credits */}
       <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 mt-auto">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col items-center gap-4">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col-reverse md:flex-row justify-between items-center gap-4">
             
-            {/* Group Name */}
-            <div className="flex items-center gap-2">
-                <span className="text-slate-500 dark:text-slate-400 text-sm">
-                    گروه:
+            {/* Website Address (Right side in RTL) */}
+            <a 
+              href="https://www.dastyartalaei.ir" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-indigo-600 dark:text-slate-500 dark:hover:text-indigo-400 text-sm font-mono tracking-wider transition-colors"
+            >
+                www.dastyartalaei.ir
+            </a>
+
+            {/* Designer Signature (Left side in RTL) */}
+            <div className="flex items-center gap-2 group select-none">
+                <span className="text-slate-400 text-[10px] uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">
+                    Design & Dev:
                 </span>
-                <span className={`${branding.colorClass} font-black text-2xl tracking-widest`}>
-                    ROJHALAT
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-100 dark:to-slate-400 font-black text-sm tracking-wide group-hover:from-indigo-600 group-hover:to-purple-600 transition-all duration-300 transform group-hover:scale-105 inline-block">
+                    Amyar Moradifar
                 </span>
-            </div>
-
-            {/* Credits */}
-            <div className={`flex flex-col md:flex-row gap-4 items-center text-center`}>
-                {/* Designer */}
-                <div className="flex items-center gap-1">
-                    <span className="text-slate-500 dark:text-slate-400 text-xs">
-                        طراح:
-                    </span>
-                    <span className={`text-slate-800 dark:text-slate-200 font-bold text-sm`}>
-                        آمیار مرادی فر
-                    </span>
-                </div>
-
-                <div className="hidden md:block w-1 h-1 bg-slate-300 rounded-full"></div>
-
-                {/* Sponsor */}
-                <div className="flex items-center gap-1">
-                    <span className="text-slate-500 dark:text-slate-400 text-xs">
-                        اسپانسر:
-                    </span>
-                    <span className={`text-slate-800 dark:text-slate-200 font-bold text-sm`}>
-                        امیر مرادی فر
-                    </span>
-                </div>
             </div>
             
         </div>

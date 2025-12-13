@@ -44,7 +44,7 @@ const MOCK_FLASHCARDS: Flashcard[] = [
 const MOCK_STEPS: StepByStepExercise[] = [
   {
     question: "جسمی به جرم ۲ کیلوگرم با سرعت ۱۰ متر بر ثانیه حرکت می‌کند. انرژی جنبشی آن چقدر است؟ (آفلاین)",
-    solution: "**فرمول:** $$K = \\frac{1}{2}mv^2$$ \n\n **جایگذاری:** $$K = 0.5 \\times 2 \\times 100$$ \n\n **پاسخ:** $$K = 100 \\text{ Joules}$$"
+    solution: "طبق فرمول انرژی جنبشی داریم:\n$$K = \\frac{1}{2}mv^2$$\nبا جایگذاری اعداد:\n$$K = 0.5 \\times 2 \\times 100$$\nبنابراین:\n$$K = 100 \\text{ J}$$"
   }
 ];
 
@@ -85,9 +85,15 @@ const parseJson = <T>(text: string | undefined, fallback: T): T => {
 };
 
 const getSystemInstruction = (subjectTitle: string) => `
-You are an expert ${subjectTitle} teacher for Grade 10 students.
+You are an expert ${subjectTitle} teacher for Grade 10 students in Iran.
 Language: Persian (Farsi).
-Return ONLY valid JSON.
+Style: Like high-quality Iranian textbooks (e.g., Kheili Sabz, Gaj).
+Rules:
+1. Return ONLY valid JSON.
+2. IMPORTANT: Wrap ALL math formulas, equations, variables (like x, y, kg, m/s), and numbers in formulas with '$$' for block equations or '$' for inline math.
+3. Example: "سرعت جسم برابر است با $v = 20 m/s$."
+4. Do NOT output raw LaTeX without delimiters.
+5. Use Persian numbers (۰-۹) for text descriptions, but English numbers (0-9) INSIDE the math formulas ($...$).
 `;
 
 // --- API FUNCTIONS ---
@@ -139,8 +145,9 @@ export const generateFlashcards = async (subjectTitle: string, chapter: string, 
 };
 
 export const generateStepByStepExercises = async (subjectTitle: string, chapter: string): Promise<StepByStepExercise[]> => {
-  const prompt = `Create 3 exercises for ${subjectTitle} Grade 10, Chapter: "${chapter}".
-  Output JSON Array: [{"question": "...", "solution": "..."}]`;
+  const prompt = `Create 3 textbook-style exercises with DETAILED solutions for ${subjectTitle} Grade 10, Chapter: "${chapter}".
+  Output JSON Array: [{"question": "...", "solution": "..."}]
+  Make sure to format the solution with steps, using '$$' for formulas.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -157,7 +164,7 @@ export const generateStepByStepExercises = async (subjectTitle: string, chapter:
 };
 
 export const generateSampleQuestions = async (subjectTitle: string, chapter: string): Promise<SampleQuestion[]> => {
-  const prompt = `Create 5 exam questions for ${subjectTitle} Grade 10, Chapter: "${chapter}".
+  const prompt = `Create 5 descriptive exam questions for ${subjectTitle} Grade 10, Chapter: "${chapter}".
   Output JSON Array: [{"question": "...", "answer": "..."}]`;
 
   try {
@@ -178,14 +185,15 @@ export const solveProblem = async (subjectTitle: string, problemText: string, im
   try {
     const parts: any[] = [];
     if (imageData) parts.push({ inlineData: { mimeType: imageData.mimeType, data: imageData.data } });
-    parts.push({ text: `Solve this ${subjectTitle} problem in Persian. Use LaTeX.` }); // Append prompt to text
+    parts.push({ text: `Solve this ${subjectTitle} problem in Persian. Use LaTeX.` }); 
 
-    // Note: generateContent 'contents' can be a string or parts. Here we use parts.
-    // However, we need to pass the prompt along with the image.
-    // The previous implementation added text to parts which is correct.
-    parts[parts.length - 1].text = `Solve this ${subjectTitle} problem step-by-step in Persian.
+    parts[parts.length - 1].text = `Solve this ${subjectTitle} problem step-by-step in Persian, like an Iranian textbook.
       Problem: ${problemText}
-      Use LaTeX for math.`;
+      Rules:
+      1. Use LaTeX for ALL math formulas, wrapped in '$$' or '$'.
+      2. Use Persian digits for text explanation.
+      3. Use English digits inside the LaTeX formulas.
+      `;
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
